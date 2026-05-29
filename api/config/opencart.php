@@ -15,6 +15,8 @@ return [
 
     'language_id' => (int) env('OPENCART_LANGUAGE_ID', 1),
 
+    'customer_group_id' => (int) env('OPENCART_CUSTOMER_GROUP_ID', 1),
+
     'image_base_url' => rtrim(env('OPENCART_IMAGE_BASE_URL', 'http://localhost/ecomchempro/upload/image'), '/'),
 
     /*

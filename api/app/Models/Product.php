@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -15,6 +17,7 @@ class Product extends OpenCartModel
 
     protected $casts = [
         'price' => 'float',
+        'rrp_price' => 'float',
         'quantity' => 'integer',
         'status' => 'boolean',
         'date_available' => 'date',
@@ -60,6 +63,50 @@ class Product extends OpenCartModel
     {
         return $this->hasMany(ProductImage::class, 'product_id', 'product_id')
             ->orderBy('sort_order');
+    }
+
+    public function scopeWithCatalogPricing(Builder $query): Builder
+    {
+        $customerGroupId = (int) config('opencart.customer_group_id');
+
+        $discountSubquery = DB::table('product_discount as pd2')
+            ->select('pd2.price')
+            ->whereColumn('pd2.product_id', 'product.product_id')
+            ->where('pd2.customer_group_id', $customerGroupId)
+            ->where('pd2.quantity', 1)
+            ->where(function ($q) {
+                $q->where('pd2.date_start', '0000-00-00')
+                    ->orWhere('pd2.date_start', '<', now());
+            })
+            ->where(function ($q) {
+                $q->where('pd2.date_end', '0000-00-00')
+                    ->orWhere('pd2.date_end', '>', now());
+            })
+            ->orderBy('pd2.priority')
+            ->orderBy('pd2.price')
+            ->limit(1);
+
+        $specialSubquery = DB::table('product_special as ps')
+            ->select('ps.price')
+            ->whereColumn('ps.product_id', 'product.product_id')
+            ->where('ps.customer_group_id', $customerGroupId)
+            ->where(function ($q) {
+                $q->where('ps.date_start', '0000-00-00')
+                    ->orWhere('ps.date_start', '<', now());
+            })
+            ->where(function ($q) {
+                $q->where('ps.date_end', '0000-00-00')
+                    ->orWhere('ps.date_end', '>', now());
+            })
+            ->orderBy('ps.priority')
+            ->orderBy('ps.price')
+            ->limit(1);
+
+        return $query->addSelect([
+            'product.*',
+            'catalog_discount_price' => $discountSubquery,
+            'catalog_special_price' => $specialSubquery,
+        ]);
     }
 
     public function scopeActive($query)

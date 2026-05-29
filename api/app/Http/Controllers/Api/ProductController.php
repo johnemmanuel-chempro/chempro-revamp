@@ -17,6 +17,7 @@ class ProductController extends Controller
         $perPage = min((int) $request->query('per_page', 20), 100);
 
         $query = Product::query()
+            ->withCatalogPricing()
             ->with(['description', 'manufacturer'])
             ->active()
             ->forStore();
@@ -52,6 +53,7 @@ class ProductController extends Controller
     public function show(int $id): ProductDetailResource
     {
         $product = Product::query()
+            ->withCatalogPricing()
             ->with([
                 'description',
                 'manufacturer',

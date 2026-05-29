@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\ProductPricingService;
 use App\Services\SeoUrlService;
 use App\Services\SettingsConfigService;
 use Illuminate\Support\ServiceProvider;
@@ -15,6 +16,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(SettingsConfigService::class);
         $this->app->singleton(SeoUrlService::class);
+        $this->app->singleton(ProductPricingService::class);
     }
 
     /**

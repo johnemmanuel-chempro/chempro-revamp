@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\Concerns\HasProductPricing;
 use App\Http\Resources\Concerns\HasSeoUrls;
 use App\Support\OpenCartImage;
 use Illuminate\Http\Request;
@@ -9,6 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductResource extends JsonResource
 {
+    use HasProductPricing;
     use HasSeoUrls;
 
     public function toArray(Request $request): array
@@ -18,7 +20,7 @@ class ProductResource extends JsonResource
             'name' => $this->whenLoaded('description', fn () => $this->description?->name),
             'model' => $this->model,
             'sku' => $this->sku,
-            'price' => $this->price,
+            ...$this->productPricingFields($this->resource),
             'quantity' => (int) $this->quantity,
             'image' => OpenCartImage::url($this->image),
             ...$this->productSeoFields((int) $this->product_id),
