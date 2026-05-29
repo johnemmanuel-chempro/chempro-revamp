@@ -129,7 +129,7 @@ class Product extends OpenCartModel
 
     public function scopeInCategory($query, int $categoryId)
     {
-        return $query->whereHas('categories', fn ($q) => $q->where('category_id', $categoryId));
+        return $query->whereHas('categories', fn ($q) => $q->where('product_to_category.category_id', $categoryId));
     }
 
     public function scopeSearch($query, string $term)

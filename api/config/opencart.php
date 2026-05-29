@@ -39,4 +39,10 @@ return [
 
     'settings_cache_store' => env('OPENCART_SETTINGS_CACHE_STORE', 'file'),
 
+    'navigation_max_depth' => (int) env('OPENCART_NAVIGATION_MAX_DEPTH', 3),
+
+    'navigation_products_per_category' => (int) env('OPENCART_NAVIGATION_PRODUCTS_PER_CATEGORY', 8),
+
+    'navigation_cache_ttl' => (int) env('OPENCART_NAVIGATION_CACHE_TTL', 3600),
+
 ];
