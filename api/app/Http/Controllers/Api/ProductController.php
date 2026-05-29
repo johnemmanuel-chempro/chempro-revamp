@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Facades\SeoUrl;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductDetailResource;
 use App\Http\Resources\ProductResource;
@@ -37,6 +38,14 @@ class ProductController extends Controller
             ->orderBy('product_id')
             ->paginate($perPage);
 
+        SeoUrl::preloadProducts($products->getCollection());
+
+        $manufacturers = $products->getCollection()->pluck('manufacturer')->filter();
+
+        if ($manufacturers->isNotEmpty()) {
+            SeoUrl::preloadManufacturers($manufacturers);
+        }
+
         return ProductResource::collection($products);
     }
 
@@ -53,6 +62,14 @@ class ProductController extends Controller
             ->forStore()
             ->where('product_id', $id)
             ->firstOrFail();
+
+        SeoUrl::preloadProducts(collect([$product]));
+
+        if ($product->manufacturer) {
+            SeoUrl::preloadManufacturers(collect([$product->manufacturer]));
+        }
+
+        SeoUrl::preloadCategories($product->categories);
 
         return new ProductDetailResource($product);
     }

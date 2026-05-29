@@ -2,12 +2,15 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\Concerns\HasSeoUrls;
 use App\Support\OpenCartImage;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductDetailResource extends JsonResource
 {
+    use HasSeoUrls;
+
     public function toArray(Request $request): array
     {
         return [
@@ -23,6 +26,7 @@ class ProductDetailResource extends JsonResource
             'quantity' => (int) $this->quantity,
             'minimum' => (int) $this->minimum,
             'image' => OpenCartImage::url($this->image),
+            ...$this->productSeoFields((int) $this->product_id),
             'images' => $this->whenLoaded('images', fn () => $this->images->map(fn ($img) => [
                 'id' => $img->product_image_id,
                 'image' => OpenCartImage::url($img->image),
@@ -32,10 +36,12 @@ class ProductDetailResource extends JsonResource
                 'id' => $this->manufacturer->manufacturer_id,
                 'name' => $this->manufacturer->name,
                 'image' => OpenCartImage::url($this->manufacturer->image),
+                ...$this->manufacturerSeoFields((int) $this->manufacturer->manufacturer_id),
             ] : null),
             'categories' => $this->whenLoaded('categories', fn () => $this->categories->map(fn ($cat) => [
                 'id' => $cat->category_id,
                 'name' => $cat->description?->name,
+                ...$this->categorySeoFields((int) $cat->category_id),
             ])),
         ];
     }

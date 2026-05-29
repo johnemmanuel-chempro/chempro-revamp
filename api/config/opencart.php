@@ -17,6 +17,24 @@ return [
 
     'image_base_url' => rtrim(env('OPENCART_IMAGE_BASE_URL', 'http://localhost/ecomchempro/upload/image'), '/'),
 
+    /*
+    | Storefront base URL for SEO links (no trailing slash).
+    | Falls back to config_ssl / config_url from oc_setting when empty.
+    */
+    'storefront_url' => env('OPENCART_STOREFRONT_URL'),
+
+    /*
+    | Product URLs: include category path segments before product slug (OpenCart-style).
+    */
+    'seo_product_include_category_path' => env('OPENCART_SEO_PRODUCT_CATEGORY_PATH', true),
+
     'placeholder_image' => env('OPENCART_PLACEHOLDER_IMAGE', ''),
+
+    /*
+    | Seconds to cache oc_setting rows per store (0 = forever until clearCache).
+    */
+    'settings_cache_ttl' => (int) env('OPENCART_SETTINGS_CACHE_TTL', 3600),
+
+    'settings_cache_store' => env('OPENCART_SETTINGS_CACHE_STORE', 'file'),
 
 ];

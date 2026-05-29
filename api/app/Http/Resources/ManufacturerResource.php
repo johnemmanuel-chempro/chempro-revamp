@@ -2,12 +2,15 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\Concerns\HasSeoUrls;
 use App\Support\OpenCartImage;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ManufacturerResource extends JsonResource
 {
+    use HasSeoUrls;
+
     public function toArray(Request $request): array
     {
         return [
@@ -15,6 +18,7 @@ class ManufacturerResource extends JsonResource
             'name' => $this->name,
             'image' => OpenCartImage::url($this->image),
             'sort_order' => (int) $this->sort_order,
+            ...$this->manufacturerSeoFields((int) $this->manufacturer_id),
         ];
     }
 }

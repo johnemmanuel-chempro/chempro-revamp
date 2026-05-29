@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\SeoUrlService;
+use App\Services\SettingsConfigService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,7 +13,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(SettingsConfigService::class);
+        $this->app->singleton(SeoUrlService::class);
     }
 
     /**

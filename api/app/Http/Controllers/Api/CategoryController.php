@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Facades\SeoUrl;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
@@ -24,6 +25,8 @@ class CategoryController extends Controller
             ->orderBy('category_id')
             ->paginate($perPage);
 
+        SeoUrl::preloadCategories($categories->getCollection());
+
         return CategoryResource::collection($categories);
     }
 
@@ -35,6 +38,8 @@ class CategoryController extends Controller
             ->forStore()
             ->where('category_id', $id)
             ->firstOrFail();
+
+        SeoUrl::preloadCategories(collect([$category]));
 
         return new CategoryResource($category);
     }

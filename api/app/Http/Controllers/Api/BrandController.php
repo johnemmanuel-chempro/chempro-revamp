@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Facades\SeoUrl;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ManufacturerResource;
 use App\Models\Manufacturer;
@@ -19,6 +20,8 @@ class BrandController extends Controller
             ->orderBy('name')
             ->paginate($perPage);
 
+        SeoUrl::preloadManufacturers($brands->getCollection());
+
         return ManufacturerResource::collection($brands);
     }
 
@@ -28,6 +31,8 @@ class BrandController extends Controller
             ->forStore()
             ->where('manufacturer_id', $id)
             ->firstOrFail();
+
+        SeoUrl::preloadManufacturers(collect([$brand]));
 
         return new ManufacturerResource($brand);
     }
