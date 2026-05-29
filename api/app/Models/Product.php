@@ -73,7 +73,11 @@ class Product extends OpenCartModel
     {
         $storeId ??= config('opencart.store_id');
 
-        return $query->whereHas('stores', fn ($q) => $q->where('store_id', $storeId));
+        return $query->whereExists(function ($sub) use ($storeId) {
+            $sub->from('product_to_store')
+                ->whereColumn('product_to_store.product_id', 'product.product_id')
+                ->where('product_to_store.store_id', $storeId);
+        });
     }
 
     public function scopeInCategory($query, int $categoryId)

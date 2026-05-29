@@ -30,6 +30,10 @@ class Manufacturer extends OpenCartModel
     {
         $storeId ??= config('opencart.store_id');
 
-        return $query->whereHas('stores', fn ($q) => $q->where('store_id', $storeId));
+        return $query->whereExists(function ($sub) use ($storeId) {
+            $sub->from('manufacturer_to_store')
+                ->whereColumn('manufacturer_to_store.manufacturer_id', 'manufacturer.manufacturer_id')
+                ->where('manufacturer_to_store.store_id', $storeId);
+        });
     }
 }
