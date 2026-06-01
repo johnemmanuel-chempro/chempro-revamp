@@ -9,10 +9,125 @@ main {
   flex: 1 0 auto;
 }
 
-.dropdown-menu-mega {
-  min-width: min(900px, 95vw);
-  max-height: 70vh;
+/* Full-width mega menu aligned to navbar container */
+@media (min-width: 992px) {
+  .dropdown-menu-mega {
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0 0 0.375rem 0.375rem;
+  }
+}
+
+/* Chemist Warehouse–style 3-column category flyout */
+.products-mega-menu {
+  min-height: 320px;
+  max-height: min(75vh, 560px);
+  background: #fff;
+  padding: 0px 10px 0px 10px;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
+  border-radius: 0.375rem;
+}
+
+.mega-menu-col {
+  flex: 0 0 220px;
+  max-width: 260px;
+  min-width: 200px;
+  max-height: min(75vh, 560px);
   overflow-y: auto;
+  overflow-x: hidden;
+  border-right: 1px solid #dee2e6;
+}
+
+.mega-menu-col:last-child {
+  border-right: 0;
+}
+
+.products-mega-menu.has-l3 .mega-menu-col:last-child {
+  flex: 1 1 auto;
+  max-width: none;
+}
+
+.mega-menu-col-header {
+  padding: 0.75rem 1rem 0.5rem;
+  border-bottom: 1px solid #e9ecef;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 1;
+}
+
+.mega-menu-col-title {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0d6efd;
+  text-decoration: none;
+  line-height: 1.3;
+}
+
+.mega-menu-col-title:hover {
+  color: #0a58ca;
+  text-decoration: underline;
+}
+
+.mega-menu-col-list {
+  padding: 0.25rem 0;
+}
+
+.mega-menu-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 0.45rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  color: #212529;
+  text-decoration: none;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.mega-menu-row-label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.mega-menu-chevron {
+  flex: 0 0 auto;
+  color: #6c757d;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.mega-menu-row:hover,
+.mega-menu-row:focus {
+  background-color: #f1f3f5;
+  color: #212529;
+}
+
+.mega-menu-row.active {
+  background-color: #e9ecef;
+  font-weight: 500;
+}
+
+.mega-menu-row.active .mega-menu-chevron {
+  color: #212529;
+}
+
+/* Leaf links in the third column */
+.products-mega-menu.has-l3 .mega-menu-col:last-child .mega-menu-row {
+  font-weight: 400;
+}
+
+.products-mega-menu.has-l3 .mega-menu-col:last-child .mega-menu-chevron {
+  display: none;
 }
 
 .brand-card {
@@ -21,4 +136,25 @@ main {
 
 .brand-card:hover {
   box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 991.98px) {
+  .products-mega-menu {
+    flex-direction: column;
+    max-height: none;
+    min-height: 0;
+  }
+
+  .mega-menu-col {
+    flex: 1 1 auto;
+    max-width: none;
+    min-width: 0;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .mega-menu-col:last-child {
+    border-bottom: 0;
+  }
 }

@@ -10,15 +10,6 @@ export type StoreInfo = {
   };
 };
 
-export type MenuProduct = {
-  id: number;
-  name: string | null;
-  slug: string | null;
-  path: string | null;
-  url: string | null;
-  price: number;
-};
-
 export type MenuCategory = {
   id: number;
   name: string | null;
@@ -26,7 +17,6 @@ export type MenuCategory = {
   path: string | null;
   url: string | null;
   children: MenuCategory[];
-  products: MenuProduct[];
 };
 
 export type ProductsMenuResponse = {

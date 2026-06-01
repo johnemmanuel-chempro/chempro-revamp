@@ -49,7 +49,7 @@ export default function SiteHeader({ store, productCategories }: SiteHeaderProps
                 </Link>
               </li>
 
-              <li className="nav-item dropdown">
+              <li className="nav-item dropdown position-static">
                 <button
                   className="nav-link dropdown-toggle"
                   type="button"
@@ -59,8 +59,10 @@ export default function SiteHeader({ store, productCategories }: SiteHeaderProps
                 >
                   Products
                 </button>
-                <div className="dropdown-menu dropdown-menu-mega p-3">
+                <div className="dropdown-menu dropdown-menu-mega w-100 mt-0 border-0 p-0">
+                  <div className="container">
                   <ProductsNavMenu categories={productCategories} />
+                  </div>
                 </div>
               </li>
 

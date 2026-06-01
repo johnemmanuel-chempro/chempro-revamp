@@ -1,99 +1,189 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { decodeHtml } from "@/lib/html";
 import { appPath } from "@/lib/paths";
-import type { MenuCategory, MenuProduct } from "@/types/api";
+import type { MenuCategory } from "@/types/api";
 
 type ProductsNavMenuProps = {
   categories: MenuCategory[];
 };
 
-function ProductLinks({ products }: { products: MenuProduct[] }) {
-  if (products.length === 0) {
-    return null;
+function ChevronRight() {
+  return (
+    <span className="mega-menu-chevron" aria-hidden>
+      ›
+    </span>
+  );
+}
+
+function CategoryRow({
+  category,
+  isActive,
+  hasChildren,
+  onActivate,
+}: {
+  category: MenuCategory;
+  isActive: boolean;
+  hasChildren: boolean;
+  onActivate: () => void;
+}) {
+  const href = appPath(category.path, category.url, category.slug);
+  const label = decodeHtml(category.name);
+
+  if (!hasChildren) {
+    return (
+      <Link
+        href={href}
+        className={`mega-menu-row${isActive ? " active" : ""}`}
+        onMouseEnter={onActivate}
+        onFocus={onActivate}
+      >
+        <span className="mega-menu-row-label">{label}</span>
+      </Link>
+    );
   }
 
   return (
-    <ul className="list-unstyled mb-0 ps-2 border-start">
-      {products.map((product) => (
-        <li key={product.id}>
-          <Link
-            className="dropdown-item py-1 small"
-            href={appPath(product.path, product.url, product.slug)}
-          >
-            {product.name}
-            {product.price > 0 && (
-              <span className="text-muted ms-1">${product.price.toFixed(2)}</span>
-            )}
-          </Link>
-        </li>
-      ))}
-    </ul>
+    <button
+      type="button"
+      className={`mega-menu-row${isActive ? " active" : ""}`}
+      onMouseEnter={onActivate}
+      onFocus={onActivate}
+      onClick={onActivate}
+    >
+      <span className="mega-menu-row-label">{label}</span>
+      <ChevronRight />
+    </button>
   );
 }
 
-function Level3List({ categories }: { categories: MenuCategory[] }) {
+function CategoryColumn({
+  title,
+  titleHref,
+  categories,
+  activeId,
+  onActivate,
+}: {
+  title?: string;
+  titleHref?: string;
+  categories: MenuCategory[];
+  activeId: number | null;
+  onActivate: (id: number) => void;
+}) {
   return (
-    <ul className="list-unstyled mb-2 small">
-      {categories.map((category) => (
-        <li key={category.id} className="mb-2">
-          <Link
-            className="fw-semibold text-decoration-none"
-            href={appPath(category.path, category.url, category.slug)}
-          >
-            {category.name}
-          </Link>
-          <ProductLinks products={category.products} />
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function Level2List({ categories }: { categories: MenuCategory[] }) {
-  return (
-    <ul className="list-unstyled mb-0">
-      {categories.map((category) => (
-        <li key={category.id} className="mb-3">
-          <Link
-            className="fw-semibold text-decoration-none"
-            href={appPath(category.path, category.url, category.slug)}
-          >
-            {category.name}
-          </Link>
-          {category.children.length > 0 ? (
-            <Level3List categories={category.children} />
+    <div className="mega-menu-col">
+      {title && (
+        <div className="mega-menu-col-header">
+          {titleHref ? (
+            <Link href={titleHref} className="mega-menu-col-title">
+              {title}
+            </Link>
           ) : (
-            <ProductLinks products={category.products} />
+            <span className="mega-menu-col-title">{title}</span>
           )}
-        </li>
-      ))}
-    </ul>
+        </div>
+      )}
+      <ul className="list-unstyled mb-0 mega-menu-col-list">
+        {categories.map((category) => {
+          const hasChildren = category.children.length > 0;
+
+          return (
+            <li key={category.id}>
+              <CategoryRow
+                category={category}
+                isActive={category.id === activeId}
+                hasChildren={hasChildren}
+                onActivate={() => onActivate(category.id)}
+              />
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }
 
 export default function ProductsNavMenu({ categories }: ProductsNavMenuProps) {
+  const [activeL1Id, setActiveL1Id] = useState<number>(categories[0]?.id ?? 0);
+  const [activeL2Id, setActiveL2Id] = useState<number | null>(null);
+
+  const activeL1 =
+    categories.find((category) => category.id === activeL1Id) ?? categories[0];
+  const l2Items = activeL1?.children ?? [];
+  const activeL2 =
+    l2Items.find((category) => category.id === activeL2Id) ??
+    (l2Items.length > 0 ? l2Items[0] : null);
+  const l3Items = activeL2?.children ?? [];
+
+  useEffect(() => {
+    if (!activeL1) {
+      return;
+    }
+
+    if (l2Items.length === 0) {
+      setActiveL2Id(null);
+      return;
+    }
+
+    const stillValid = l2Items.some((category) => category.id === activeL2Id);
+    if (!stillValid) {
+      setActiveL2Id(l2Items[0].id);
+    }
+  }, [activeL1Id, activeL1, l2Items, activeL2Id]);
+
   if (categories.length === 0) {
-    return <p className="text-muted mb-0">No categories available.</p>;
+    return <p className="text-muted mb-0 px-3 py-2">No categories available.</p>;
   }
 
+  const showL2 = l2Items.length > 0;
+  const showL3 = l3Items.length > 0;
+
   return (
-    <div className="row g-4">
-      {categories.map((category) => (
-        <div key={category.id} className="col-12 col-md-6 col-lg-4 col-xl-3">
-          <h6 className="text-uppercase fw-bold mb-2">
+    <div
+      className={`products-mega-menu d-flex${showL2 ? " has-l2" : ""}${showL3 ? " has-l3" : ""}`}
+    >
+      <CategoryColumn
+        categories={categories}
+        activeId={activeL1?.id ?? null}
+        onActivate={setActiveL1Id}
+      />
+
+      {showL2 && activeL1 && (
+        <CategoryColumn
+          title={decodeHtml(activeL1.name) ?? ""}
+          titleHref={appPath(activeL1.path, activeL1.url, activeL1.slug)}
+          categories={l2Items}
+          activeId={activeL2?.id ?? null}
+          onActivate={setActiveL2Id}
+        />
+      )}
+
+      {showL3 && activeL2 && (
+        <div className="mega-menu-col">
+          <div className="mega-menu-col-header">
             <Link
-              className="text-decoration-none"
-              href={appPath(category.path, category.url, category.slug)}
+              href={appPath(activeL2.path, activeL2.url, activeL2.slug)}
+              className="mega-menu-col-title"
             >
-              {category.name}
+              {decodeHtml(activeL2.name)}
             </Link>
-          </h6>
-          {category.children.length > 0 ? (
-            <Level2List categories={category.children} />
-          ) : (
-            <ProductLinks products={category.products} />
-          )}
+          </div>
+          <ul className="list-unstyled mb-0 mega-menu-col-list">
+            {l3Items.map((category) => (
+              <li key={category.id}>
+                <Link
+                  href={appPath(category.path, category.url, category.slug)}
+                  className="mega-menu-row"
+                >
+                  <span className="mega-menu-row-label">{decodeHtml(category.name)}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
-      ))}
+      )}
     </div>
   );
 }
